@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Algorytmy Rozproszone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Armata|Encode+Sans|Josefin+Sans|Lato" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <div class="w3-container w3-teal w3-theme-d1">
+        <h1>Algorytmy rozproszone</h1>
+        <h4>Na samym wstępie chciałbym zaznaczyć, że większość materiałów pochodzi z książki: Hagit Attiya "<a href="http://students.wmi.amu.edu.pl:20002/zajecia/file-storage/view/artyku-y/alr-pliki/distrib_alg-Attiya%2epdf">Distributed algorithms</a>" i jest ona nieudolną próbą przekładu jej części na język polski. </h4>
+    </div>
+    <div class="w3-container w3-teal w3-theme-l4">
+        <h2>Model <i>message passing</i></h2>
+        <h3>Wstęp</h3>
+        <p>Na początku skupimy się na <i>message passing systems</i> jednych z najważniejszych modeli dla systemów rozproszonych. Message passing system jest opisywany za pomocą <b>grafów komunikacyjnych</b> w których wierzchołki grafów są reprezentowane poprzez procesory i (nieskierowane) krawędzie reprezentowane przez kanały komunikacyjne pomiędzy tymi procesorami. Każdy procesor jest niezależną jednostką wyposażoną we własną <b>pamięć</b>, która jest wykorzystywana podczas programu lokalnego. Lokalny program zawiera operacje wewnętrzne, wysyła komunikaty, oraz oczekuje na komunikaty (na kilku krawędziach). Alogrytmy dla systemu są zbiorem lokalnych programów dla różnych procesorów. Wykonaniem algorytmu jest przeplatane wykonanie lokalnych programów (zawierające pewne ograniczenia i zasady)</p>
+        <p>Kilka wariantów systemów message passing były badane w teorii przetwarzania rozproszonego. Te warianty możemy rozróżnić według następujących funkcji:</p>
+        <ul class="w3-ul w3-card-4">
+            <li><b>Graf komunikacyjny:</b> Ten graf może mieć standardową formę np. pierścienia, może być arbitralny</li>
+            <li><b>Stopień synchroniczności:</b> System może być <i>synchroniczny</i>, gdzie obliczenia są wykonywane w <i>rundach</i>. Na początku rundy każdy procesor wysyła komunikaty i oczekuje na komunikaty, które są wysyłane przez sąsiadów w tej rundzie. Po otrzymaniu tych wiadomości procesory wykonują operacje i decydują, które komunikaty są wysyłane w następnej rundzie. W systemie <i>asynchronicznym</i> procesory działają w różnych czasach. Dodatkowo mogą ponosić nieograniczone i nieprzeiwywalne (ale skończone) opóźnienie. Istnieją również modele pośrednie dla tych dwóch, których nie będziemy tu omawiać.</li>
+            <li><b>Stopień regularności:</b>  w systemach <i>anonimowych</i> wszystkie procesory są identyczne, nierzróżnialne czyli bez <b>id</b> czy innych nazw.</li>
+            <li><b>Jednolitość:</b> W <i>jednolitych</i> systemach procesory nie wiedzą ile jest wszystkich procesorów. W konsekwencji procesory wykonują ten sam program bez względu na wielkość systemu i potrafią w związku z tym używać ich do wykonywania różnych programów według wielkości systemu.</li>
+        </ul>
+        <p>Powyższe charakterystyki i kilka innych specyfikacji są dokładnym modelem systemu <i>model passing</i>. Jak możemy zauważyć w wielu sytuacjach te charakterystyki mogą przynieść fantastyczny efekt w postaci mocy systemu. Możemy zobaczyć problemy które mogę być rozwiązane łatwiej w jednym modelu, podczas gdy inny model wymaga więcej zasobów i wymagań do rozwiązania go. Ponadto możemy zobaczyć problemy, które da się rozwiązać tylko w jednym modelu.</p>
+        <h3>1.1 Definicja modelu obliczeniowego</h3>
+        <p>Przedstawmy zarys podstawowych elementów formalnego systemu message passing.</p>
+        <p>Obliczenia w tych systemach są wykonywane w sekwencji konfiguracji. We wstęnej konfiguracji procesory są w stanie początkowym, a krawędzie są puste.  Wykonanie algorytmu słada się z wydarzeń: możliwe zdarzenia są wykonywane przez procesor w początkowej operacji, komunikat wysyłany przez krawędź i dostarczany w pzeznaczone miejsce. Każde zdarzenie zarówno zmiana stanu procesora, lub zmiana krawędzi a tym samym zmiana konfiguracji systemu.</p>
+        <p>Mówiąc dokładniej, mamy <i>algorytm</i> składający się z <b>n</b> procesorów: p1...pn. Każdy procesor <i>p</i> jest zamodelowany jako (możliwie nieskończony) automat stanów z zestawem stanów <b>Q</b>. Zestaw stanów <b>Q</b> zawiera wyróżniony <i>stan początkowy q0</i>. Zakładamy że stan procesora <i>pi</i> zawiera specjalny komponent <i>buff</i> w którym nadchodzące komunikaty są <b>buforowane</b> (bufor to obszar pamięci służąc do tymczasowego przechowywania danych przesyłanych między dwoma systemami, a buforowanie to technologia je wykorzystująca w celu wyrównania różnic prędkości przesyłania danych).</p>
+        <p><i>Układ</i> jest wektorem <i>C = (q1...qn)</i> gdzie <i>qi</i> jest lokalnym stanem <i>pi</i>. <i>Wtępny układ</i> jest wektorem (q01,...q0n). Procesory komunikją się poprzez wysyłanie <i>komunikatów</i> (pobranych z alfabetu <b>M</b>) do siebie nawzajem. <i>Wysłanie akcji send(i, j, m)</i> reprezentuje wysłanie wiadomości <i><b>m</b></i> z <i><b>pi</b></i> do <i><b>pj</b></i>. Dla każdego <b><i>i, 1<= i <= n</i></b> niech <i><b>Si</b></i> oznacza ustalenie wszystkich akcji <i>send(i,j,m)</i> dla każdego <i>m</i> &isin; M i każdego <i>j</i>, <i>1 <= j</i> <= <i>n</i>.</p>
+        <p>Modelujemy obliczenia algorytmu jako sekwencję konfiguracji zmiennej ze <i>zdarzeniami</i>. Każde zdarzenie jest zarówno <i>zdarzeniem obliczeniowym</i>, reprezentowanym jako obliczeniowe kroki dla pojedynczego procesora lub jako <i>zdarzenie dostarczenia</i>, reprezentujący dostarczenie wiadomości do procesora</p>
+    </div> 
+    <footer class="w3-container w3-theme-d3">
+        Page created by: Szumimajster with using <a href="https://www.w3schools.com/w3css/">w3.css</a>
+    </footer>
+</body>
+
+</html>
