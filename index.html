@@ -49,7 +49,11 @@
         <p>W modelu synchronicznym procesory uruchamiają się w lock-step. Wykonanie jest <i>dopuszczalne</i> jeśli oprócz asynchronicznych ograniczeń dopuszczalności wymienionych wcześniej, zdarzenia obliczeniowe występują w <i>rundach</i>. Zakładamy, że każdy procesor posiada dokładnie jedno zdarzenie obliczeniowe w każdej rundzie i że zdarzenia obliczeniowe dla rundy <i><b>r</b></i> występują po zdarzeniach obliczeniowych dla rundy <i><b>r - 1</b></i>. Ponadto przyjmujemy wszysktkie wiadomości wysyłane w rundzie <i><b>r</b></i> są dostarczone przed zdarzeniem obliczeniowym rundy <i><b>r + 1</b></i>.</p>
         <h3> Omówienie tej części</h3>
         <p>W następnych rozdziałach będziemy omawiali kilka podstawowych algorytmów i "lower bounds" przeważnie na złożonych komunikatach dla obliczeń w systemach message passing. Zaczniemy od problemu <b>wyboru lidera</b> w sieciach <i>ring</i>, który reprezentuje szereg problemów z łamaniem regularności. Zaprezentujemy niższe i wyższe granice dla liczby wiadomości wymaganych do wyboru lidera, dla modeli synchronicznych i asynchronicznych. Następny rozdział zademonstruje wybór lidera w sieciach kompletnych. Następnie wrócimy do systemów message passing z dowolną siecią komunikacyjną. Omówimy problem problem minimalnego drzewa spinającego w sieci ogólnej. Potem pokażemy jak stworzyć kilka synchronizatorów w sieci ogólnej. Synchronizer pozwala na rozpoczęcie algorytmów przeznaczonych dla synchronicznych i asynchronicznych systemów.</p>
-        <p></p>
+        <p>W tej części zakładamy, że procesory i łączniki komunikacyjne są niezawodne i funkcjonują prawidłowo. Bedziemy wracać do problemów tolerancji na błędy w późniejszych częściach.</p>
+    </div>
+    <div class="w3-container w3-teal w3-theme-l5">
+        <h2>Wybór lidera w pierścieniach</h2>
+        <p>Zaczniemy nasze omówienie systemów message passing od zrozumienia których grafach komunikacyjnych występuje pierścień. Pierścienie są bardzo wygodnymi strukturami dla systemów message passing i odpowiadają  fizycznym systemom komunikacji jak np. pierścienie z tokenem (token rings). Zbadamy problem <i>wyboru lidera</i> w którym procesory muszą "wybrać" jeden z procesorów do bycia liderem. Istnienie lidera może uprościć </p>
     </div>
     <footer class="w3-container w3-theme-d3">
         Page created by: Szumimajster with using <a href="https://www.w3schools.com/w3css/">w3.css</a>
