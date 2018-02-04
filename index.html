@@ -53,7 +53,99 @@
     </div>
     <div class="w3-container w3-teal w3-theme-l5">
         <h2>Wybór lidera w pierścieniach</h2>
-        <p>Zaczniemy nasze omówienie systemów message passing od zrozumienia których grafach komunikacyjnych występuje pierścień. Pierścienie są bardzo wygodnymi strukturami dla systemów message passing i odpowiadają  fizycznym systemom komunikacji jak np. pierścienie z tokenem (token rings). Zbadamy problem <i>wyboru lidera</i> w którym procesory muszą "wybrać" jeden z procesorów do bycia liderem. Istnienie lidera może uprościć </p>
+        <p>Zaczniemy nasze omówienie systemów message passing od zrozumienia których grafach komunikacyjnych występuje pierścień. Pierścienie są bardzo wygodnymi strukturami dla systemów message passing i odpowiadają  fizycznym systemom komunikacji jak np. pierścienie z tokenem (token rings). Zbadamy problem <i>wyboru lidera</i> w którym procesory muszą "wybrać" jeden z procesorów do bycia liderem. Istnienie lidera może uprościć koordynacja między procesorami i jest pomocne w osiągnięciu odporności na błędy oraz ochrony zasobów. Ponadto problem wyboru lidera przedstawia główną klasę problemu "symmetry breaking"; techniki, które opracujemy dla nich będą używane później dla pozostałych problemów.   </p>
+        <h3>2.1 Problem</h3>
+        <p>Problem wyboru lidera ma kilka wariantów, my zdefiniujemy poniżej najbardziej ogólny. Zakładamy, że procesory nie mają wartości początkowych i ostatnią operacją w każdym lokalnym programie procesora musi być wypisanie wartości typu logicznego, odpowiadającej czy procesor jest liderem czy nie. W tym celu stworzenia algorytmu dla rozwiązania problemu wyboru lidera jest wymagane żeby kiedy wszystkie lokalne programy zostaną zakończone, dokładnie jeden procesor miał ustawioną wartość na <i>true</i> i ten procesor jest liderem wybranym przez algorytm. Wszystkie inne procesory mają ustawioną wartość na <i>false</i>.</p>
+        <p>Istnieją inne warianty rozwiązania problemu. Na przykład, w systemie z określonymi <i>id</i> można wymagać żeby lider musiał być procesorem z największym id. Również można wymagać żeby wszystkie procesory znały id lidera.</p>
+        <p>Zakładamy że pierścień jest <i>zorientowany</i>, czyli procesory rozróżniają połączenia do swioch lewych i prawych sąsiadów. Ponadto jeśli <i>pi</i> jest lewym sąsiadem <i>pj</i> to wtedy <i>pj</i> jest prawym sąsiadem <i>pi</i>.</p>
+        <h3>Pierścienie anonimowe</h3>
+        <p>Pokazaliśmy, że nie ma algorytmu deterministycznego wyboru lidera dla pierścieni anonimowych. Dla ogólności i prostoty udowodnimy wynik dla pierścieni synchronicznych; to natychmiast mplikuje takie same wyniki dla asynchronicznych pierścieni.</p>
+        <p>W dowolnym algorytmie dla pierścieni anonimowych, wszystkie procesory są identyczne i wykonują ten sam program. Przypomnijmy, że w systemie synchronicznym algorytm postępuje w rundach, wykonuje lokalne obliczenia i wtedy wysyła komunikaty. Zauważ, że lokalne programy w takich algorytmach mają następującą strukturę:</p>
+        <ul>
+            <li>W pierwszej rundzie procesor wysyła kilka początkowych zestawów komunikatów.</li>
+            <li>W drugiej rundzie, procesor otrzymuje komunikat wysłany w pierwszej rundzie i wykonuje kilka instrukcji warunkowych po których decyduje jakikomunikat powinien być wysłany w drugiej rundzie. To trwa dopóki, otrzymana wiadomość decyduje, aby zakończyć program. W tym momencie procesory wypisują logiczną wartośc na outpucie czyli <i>true</i> albo <i>false</i> w zależności czy jest liderem.</li>
+        </ul>
+        <p>Intuicyjnie, chodzi o to w pierścieniach anonimowych, aby symetria pomiędzy procesorami mogła zawsze być utrzymana, więc bez jakiejkolwiek wstępej asymetrii (dostarczone przez unikalne id), to nie może być przerwane. Konkretnie, wszystkie procesory w pierścieniu anonimowym zaczynają z tym samym stanem. Ponieważ są identyczne, w każdej rundzie każdy z nich wysyła dokładnie te same komunikaty; a zatem otrzymują wszystkie te same komunikaty w każej rundzie. W konsekwencji, jeśli jeden z procesorów zakończy program, pozostałe zrobią to samo. Stąd jest to niemożliwe, aby istniał algorytm który wybiera lidera w takim pierścieniu.</p>
+        <p>Aby sfromalizowac tą intuicję, rozważmy anonimowy pierścień od wymiarze <i>n > 1</i>, oraz załóżmy, w drodze sprzeczności, że istnieje deterministyczny algorytm <i><b>A</b></i>, dla wyboru lidera w tym pierścieniu (zakładamy, że algorytm nie jest jednolity, więc <i>n</i> jest znane dla procesorów)</p>
+        <p><b>Lemat 2.2.1</b> Ustalmy <i>A</i> jako anonimowy niejednolity algorytm. Dla każdej rundy <i>k</i>, stany wszystkich procesorów na końcu rundy <i>k</i> są takie same.</p>
+        <p><b>Dowód:</b> Udowodnijmy przez indukcję na <i>k</i>. Na początu <i>k = 1</i>, to jest proste ponieważ procesory zaczynają od takiego samego stanu i od takiego samego programu</p>
+        <p>W kroku indukcyjnym, załóżmy, że lemat jest prawdziwy dla <i>k - 1</i>. Skoro procesory są w takim samym stnie w rundzie <i>k - 1</i>, muszą wysyłać tą samą wiadomość <i>m</i>, w prawo i tą samą wiadomość <i>mr</i> w drugiej krawędzi. A zatem, wszystkie procesory dostaną te same komunikaty w rundzie <i>k</i>, i od kiedy wykonują ten sam program, są w tym samym stanie na końcu rundy <i>k + 1</i>.</p>
+        <p>
+            W tym lemacie sugerujemy, że jeśli na końcu rundy kilka procesorów ogłasza siebie jako lidera, zrobi to dla pozostałych procesorów. To zaprzecza założeniu, że <i>A</i> jest algorytmem wyboru lidera i udowadnia:
+        </p>
+        <p class="w3-card-4 w3-padding-16 w3-center"><b>Twierdzenie 2.2.2</b> <i>Nie istnieje niejednolity algorytm wyboru lidera dla pierścieni anonimowych</i></p>
+        <h3>2.3 Pierścienie asynchroniczne</h3>
+        <p> W tej sekcji pokażemy wyższe i niższe granice dla problemu wyboru lidera w grafie asynchronicznym. Zgodnie z Twierdzeniem 2.2.2 zakładam, że procesory mają id.</p>
+        <p>Zaczynamy od bardzo prostego algorytmu wyboru lidera dla pierścieni asynchronicznych, który wymaga <i>O(n<sup>2</sup>)</i> komunikatów. Ten algorytm powoduje bardziej wydajny algorytm który wymaga <i>O(n log n )</i> komunikatów. Pokazemy, że ten algorytm ma optymalną złożoność komunikatów do udowodnienia niższego rzedu czyli <i>&Omega;(n log n )</i> dla liczby kominikatów wymaganych dla wyboru lidera.</p>
+        <h3>Algorytm o złożoności <i>O(n <sup>2</sup>)</i></h3>
+        <p>W tym algorytmie kazdy procesor wysyła komunikat ze swoim id do swojego lewego sąsiada, i oczekuje na komunikat od prawego sąsiada. Kiedy odbierze taką wiadomość, sprawdza id tej wiadomości. Jeśli jest większa niż jego, wysyła komunikat do lewego; w przeciwnym razie nic z nią nie robi. Jeśli procesor otrzyma wiadomość ze swoim id, wtedy ustanawia siebie liderem poprzez wysłanie wiadomości kończącej do lewego sąsiada i kończy algorytm jako lider. Procesor który otrzymuje wiadomość kończącą  przekazuje ją w lewo i kończy jako nie-lider. Zauważmy, że nie wykorzystuje wiedzy o swojej wielkości</p>
+        <p>Zauważmy, że tylko wiadomość od procesora z maksymalnym id nigdy nie będzie zignorowana. W związku z tym tylko procesor o maksymalnym id otrzyma komunikat ze swoim id i będzie mógł zadeklarowac siebie jako lidera. Wszystkie inne procesory otrzymają komunikat kończący i nie będą wybrane na lidera. To implikuje poprawność algorytmu.</p>
+        <center><img src="pierscien1.png" width="300"><figcaption>Obraz 2.1 przypisanie etykiet</figcaption></center>
+        <p>Oczywiście, algorytm nigdy nie wyśle więcej niż <i>O(n <sup>2</sup>)</i> komunikatów. Co więcej, to jest wykonanie w któym algoytm wykonuje  <i>O(n <sup>2</sup>)</i> komunikatów: Rozważmy pierścień gdzie id procesoró są 1, ... , n i są posortowane tak, żeby <i>i</i> miał za lewego sąsiada <i>i + 1 (modulo n)</i> (tak jak na obrazie 2.1). W tej konfiguracji, komunikat procesora <i>i</i> jest przekazana dokładnie <i>i</i> razy. A zatem całkowita liczba komunikatów (nie zawierająca <i>n</i> komunikatów kończących) jest <i>&Sigma; <sup>n-1</sup> <sub>i=0</sub> i</i> czyli <i>O(n <sup>2</sup>)</i>. </p>
+        <h3>2.3.2 Alogrytm o złożoności <i>O(n log n)</i></h3>
+        <p>Bardziej efektywnym algorytmem, jest inny, ale bazujący na tej samej idei co poprzedni. Znowu procesory  wysyłają id wokół pierścienia i algorytm gwarantuje, że tylko komunikat procesora w maksymalnym id przejdzie cały pierścień i wróci. Jednakże, algorytm stosuje mądrzejszą metodę dla przekierowania id, a zatem najgorszy przypadek z liczą komunikatów na poziomie <i>O(n <sup>2</sup>)</i> na <i>O(n log n)</i>.</p>
+        <p>Aby opisać algorytm, musimy zdefiniować <i>k-sąsiedztwo</i> dla procesora <i>pi</i> w pierścieniu, będącego zestawem procesorów które są w odległości co najwyżej <i>k</i> od <i>pi</i> w tym pierścieniu (zarówno z lewej i prawej strony). Zuważmy że k-sąsiedztwo procesora zawiera dokładnie <i>2k+1</i> procesorów. Algorytm działą w fazach. W x-tej fazie procesor próbuje być chwilowym lideram w swoim 2 <sup>x</sup>-sąsiedztwie. Tylko procesory, które są liderami w x-tej fazie kontynuują (x + 1)tą fazę. A zatem, mniej procesorów kontynuuje wyższą fazę, aż do końca, tylko jeden procesor jest wybrany w całym pierścieniu.</p>
+        <p>Bardziej szczegółowo, w fazie 0, każdy procesor wysyła komnikat o tym, że jest liderem do 1-sąsiedztwa czyli do swoich obu sąsiadów. Jeśli id sąsiada otrzymującego komunikat jest większe niż to w wiadomości, ignoruje ją; w innym razie zwraca z powrotem komunikat. Jeśli komunikat wrócił od obu sąsiadów wtedy procesor jest tymczasowym liderem i kontynuuje fazę 1.</p>
+        <p>Ogólnie rzecz biorąc, w fazie <i>x</i> procesor <i>pi</i>, któy jest tymczasowym liderem w fazie <i>x - 1</i> wysyła komunikaty do swoich 2 <sup>x</sup>- sąsiedztwa (jeden w każdym kierunku) i kontynuuje w fazie <i>x + 1</i>. Procesor który otrzymuje ze swojej lewej krawędzi komunikat, identyczny jak z prawej krawędzi, kończy algorytm jako lider i wysyła komunikat kończący przez cały pierścień.</p>
+        <p> Zauważmy, że w celu implementacji algorytmu ostatni procesor w 2 <sup>x</sup>-sąsiedztwie musi zwrócić komunikat zamiast go przesłać. A zatem mamy 3 obszary w każdym komnikacie: id, liczba fazy x, oraz licznik skoków 2 <sup>x</sup>, jeśli jest ostatnim procesorem w 2 <sup>x</sup>-sąsiedztwie.</p>
+        <p>Poprawność algorytmu wynika z tych samych powodów jak w prostym algorytmie, ponieważ mają te same zasady odrzucania komunikatów. To jest jasne, że komunikaty procesora z maksymalnym id nigdy nie będą odrzucane; a zatem, ten procesor zakończy algorytm jako lider. Z drugiej strony, to jest jasne, że żaden inny komunikat nie przejdzie całego pierścienia nie bedąc po drodze odrzuconym. A zatem procesor z maksymalnym id jest jedynym wybranym przez ten algorytm liderem.</p>
+        <p>Aby przeanalizować najgorszy przypadek z największą ilością komunikatów podczas trwania algorytmu musimy najpierw udowodnić:</p>
+        <p><b>Lemat 2.3.1</b> Dla każdego x > 1, liczba procesorów, które są tymczasowymi liderami w fazie x jest mniejsza, lub równa od n / 2 <sup>x-1</sup></p>
+        <p><b>Dowód:</b> Zauważmy, że jeśli procesor <i>pi</i> kontynuuje fazę <i>x</i>, to ma zagwarantowane, że wszysktie procesory w <i>pi</i>'tym 2 <sup>x - 1</sup> sąsiedztwie mają id mniejsze niż <i>pi</i>. W przeciwnym razie, jeden z nich może odrzucić wiadomość w fazie <i>x - 1</i>. W związku z tym, żaden w <i>pi</i>'tym 2 <sup>x - 1</sup> będącym chwilowym liderem w fazie <i>x - 1</i>. Stąd, pomiędzy dowolnymi dwoma kolejnymi procesorami, które są tymczasowymi liderami w fazie x są przynajmniej 2 <sup>l - 1</sup> procesory, które nimi nie są. A zatem, ostateczna liczba procesorów które są chwilowymi liderami w fazie <i>x</i> są co najwyżej n  2 <sup>x - 1</sup>.</p>
+        <p>Aby zakończyć analizę, zauważmy, że dla każdego z dwóch komunikatów, które są wysyłane przez tymczasowego lidera w fazie x, jest pokonany co najwyżej dystans 2 <sup>x</sup> i zwraca ten sam dystans. A zatem każdy procesor, który zaczyna fazę x jest odpowiedzialny za co najwyżej 4*2 <sup>x</sup> komunikatów. Z Lematu 2.3.1 liczba procesorów które zaczynają fazę x jest co najwyżej n / 2 <sup>x - 1</sup>. A zatem, całkowita liczba komunikatów wysyłanych w każdej fazie wynosi co najwyżej 8n. Ponieważ jest <i>n</i> procesorów jest co najwyżej log n faz i w związku z tym całkowta liczba komunikatów wysyłanych przez algorytm wynosie 8nlogn.</p>
+        <p>Podsumowując, pokazaliśmy algorytm wyboru lidera którego złożoność komunikatów wynosi <i>O(n log n)</i>. Zauważmy, że w przeciwieństwie do prostego algorytmu z poprzeniej sekcji, wykorzystaliśmy fakt, że pierścień jest dwukierunkowy.</p>
+        <h3>Pierścienie synchroniczne</h3>
+        <p>Teraz możemy zabrać się za problem wyboru lidera w pierścieniu synchronicznycm. Znowu zaprozentujemy wyższą i niższą granicę. Dla wyższej granicy dwa algorytmy wyboru lidera będą wymagały <i>O(n)</i> komunikatów. Oczywiście, złożoność komunikatów w tych algorytmach jest optymalna. Jednakże, nie są ograniczone przez czas i wykorzystują id procesoró w wyjątkowych przypadkach. Dla najniższych granic, pokażemy że dowolny algorytm który jest ograniczony do używania tylko porównań id, lub ograniczony poprzez czas granicy wymaga <i>&Omega;(n log n )</i> komunikatów. </p>
+        <h3>Kolorowanie wierzchołkowe w drzewie ukorzenionym i w grafach stałego stopnia</h3>
+        <ul>
+            <li>Każde <b>drzewo</b> może być pokolorowane <b>dwoma kolorami</b></li>
+            <li>Każdy <b>graf</b> któego maksymalnym stpomniem liścia jest <i>D</i> może być pokolorowany poprzez <i>D+1</i> kolory</li>
+            <li>Każdy <b>graf planarny</b>(graf, który można narysować na płaszczyźnie tak, by krzywe obrazujące krawędzie grafu nie przecinały się ze sobą) może być pokolorowany 4 kolorami, ale nie jest znany algorytm rozproszony i scentralizowany algorytm jest bardzo niewygodny</li>
+            <li>Dowolne <b>drzewo</b> wielkości <b>n</b> może być pokolorowane używając 3 kolorów w <b>log(n) rundach (Cole and Vishkin)</b></li>
+        </ul>
+        <h3>O(logn) kolorowanie drzewa</h3>
+        <h4>Algorytmem C&V</h4>
+        <p>Log*(n) jest najmniejszą liczną log-operacji potrzebnych do zmniejszenia kolorów z <b>n</b> do mniejszej lub równej 2. Np. załóżmy,że n = trylion<br>
+        log(trylion) = 40 <br>
+        log(log(trylion)) = 5.322<br>
+        log(log(log(trylion))) < 2 <br>
+            To oznacza, że log*(trylion) = 4. To ilustruje, że funcja rośnie bardzo powoli wraz ze wzrostem liczby argumentów.</p>
+        <h4>O(log*n) kolorowanie drzewa</h4>
+        <p>
+            Weźmy <b>drzewo ukorzenione</b>. Algorytm zakłada, że początkowo kolor każdego wierzchołka jest jego id.
+        </p>
+        <p>Każdy niebędący korzenem wierzchołek <b>v</b> ma informacje o swoim rodzicu <b>p(v)</b></p>
+        <p>Interpretujemy każdy kolor c jako najmniej znaczący ciąg bitów c <sub>k-1</sub>c <sub>k-2</sub>c <sub>k-3</sub>...c <sub>0</sub>, oraz <b>|c|</b> oznaczjący wielkość ciągu bitów </p>
+        <p class="w3-card-4">
+            <b><center>Przebieg algorytmu</center></b><br>
+            <b>program</b> <i>redukcja</i> dla ukorzenionego drzewa<br>
+            Kolor wierzchołka będącego korzeniem ustawiamy na 0 po którym następuje bit 0 dla jego starego koloru<br>
+            {Program dla każdego nie-korzenia wierzchołka <i>v</i> w rundzie}<br>
+            <b>do</b> c(v)>= 6 -> <br>
+            {Niech j = najmniejszy indeks gdzie ciąg bitów c(v) i c(p(v)) różnią się} <br>
+            nowy kolor c(v):= ciąg bitów dla <i>j</i> po którym następuje bit <i>j</i> od c(v)<br>
+            <b>od</b><br>
+            <center><img src="tree1.png" width="700"></center>
+        <h4>Operacja przesunięcia w dół</h4>
+        <p> Korzeń wybiera nowy kolor < 6 i różniący się od obecnego koloru<br>
+        dla każdego nie-korzenia wierzchołek <b>v</b> jednocześnie wykonuje c(v) := c(p(v))
+        </p>
+         <center><img src="tree2.png" width="700"></center>
+         <h4>Redukcja ilości kolorów z 6 do 3</h4>
+         <p>
+             z:= 3 <br>
+             <b>do</b> z<= 5 &rarr; <br>
+             <span style="padding-left: 20px"> c(v) &rarr; wybierz kolor spośród {0, 1,2} nie używając sąsiadów <i>v</i></span> <br>
+             <span style="padding-left: 20px"> z:= z + 1</span> <br>
+             <b>od</b>
+             
+         </p>
+        <h2>Algorytm C&V v2</h2>
+        <h3>Czynności wstępne</h3>
+        <p>Ta sekcja opisuje założenia modelu obliczeniowego i wprawadza notację używaną potem na papierze. Rozważamy proste, nieskierowany grafy z <i>v</i> wierzchołkami i <i>m</i> krawędziami. Maksymalny stopień grafu jest oznaczana przez &Delta;. Graf indukawany przez zestaw wierzchołków <i>X</i> jest oznaczany przez G[X]. </p>
+        <p>Podając graf <i>G = (V, E)</i> możemy powiedzieć że podzbiór wierzchołków <i>I</i> &straightepsilon; <i>V</i> jest <i>niezależny</i> jeśli nie ma dwóch wierzchołków w <i>I</i> będących sąsiadami. <i>Kolorowaniem</i> w grafie <i>G</i> jest ustalenie C : V &rarr; I <sup>+</sup> złożonych z dodatnich liczb (kolorów) dla wierzchołków w grafie. Kolorowanie jest <i>akceptowalne</i> jeśli nie ma dwóch sąsiadó o tych samych kolorach. <i>I <sup>te</sup></i> bity w kolorze wierzchołka <i>v</i> są oznaczone przez <i>C <sub>v</sub>(i)</i>. Podzbiór krawędzi <i>M</i> &straightepsilon; <i>E</i> jest prawidłowy jeśli każda para różnych krawędzi w <i>M</i> nie ma wspólnych wierzchołków</p>
+        <h2><a href="http://students.wmi.amu.edu.pl:20002/zajecia/_xowiki2/download/file/fmatch.pdf">Skojarzenie maximal w grafie dwudzielnym, w czasie O(log^4n)</a></h2>
+        <h2>dekompozycja L&S (Liniala&Saksa)</h2>
     </div>
     <footer class="w3-container w3-theme-d3">
         Page created by: Szumimajster with using <a href="https://www.w3schools.com/w3css/">w3.css</a>
