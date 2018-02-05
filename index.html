@@ -96,7 +96,20 @@
         <p>Podsumowując, pokazaliśmy algorytm wyboru lidera którego złożoność komunikatów wynosi <i>O(n log n)</i>. Zauważmy, że w przeciwieństwie do prostego algorytmu z poprzeniej sekcji, wykorzystaliśmy fakt, że pierścień jest dwukierunkowy.</p>
         <h3>Pierścienie synchroniczne</h3>
         <p>Teraz możemy zabrać się za problem wyboru lidera w pierścieniu synchronicznycm. Znowu zaprozentujemy wyższą i niższą granicę. Dla wyższej granicy dwa algorytmy wyboru lidera będą wymagały <i>O(n)</i> komunikatów. Oczywiście, złożoność komunikatów w tych algorytmach jest optymalna. Jednakże, nie są ograniczone przez czas i wykorzystują id procesoró w wyjątkowych przypadkach. Dla najniższych granic, pokażemy że dowolny algorytm który jest ograniczony do używania tylko porównań id, lub ograniczony poprzez czas granicy wymaga <i>&Omega;(n log n )</i> komunikatów. </p>
-        <h3>Kolorowanie wierzchołkowe w drzewie ukorzenionym i w grafach stałego stopnia</h3>
+        <h3>Algorytm synchroniczny jednorodny o złożoności O(n)</h3>
+        <p>W algorytmie jednorodnym nie jest znana wielkość pierścienia i ponadto procesory niekoniecznie rozpoczynają  algorytm jadnocześnie. Dokładniej, procesor albo budzi się spontanicznie w rundzie albo odbiera komunikat od innego procesora.</p>
+        <p>Algorytm jednorodny korzysta z dwóch idei. Po pierwsze, komunikaty pochodzące z różnych procesorów poruszają się z różną prędkością. Po drugie, aby poradzić sobie z asynchronicznym startem, przedwczesne dodanie fazy jest dodawane. W tej fazie, procesory, któe obudziły się wysyłają komunikat wokół pierścienia; one przechodzą bez opóźnienia. Procesor odbierający przedwczesny komunikat, zanim zacznie algorytm  nie bierze w nim udziału, działa tylko jako <i>przekaźnik</i>, który przekazuje bądź ignoruje komunikaty. Po fazie wstępnej lider jest wybrany pośród procesorów biorących w nim udział.</p>
+        <p><b>Algorytm:</b> Każdy procesor, który się budzi spontanicznie wysyła komunikat "wake up" zawierający jego id. Ten komunikat krąży w regularnych kursach (jedna krawędź na rundę) i eliminuje wszystkie procesory, które nie śpią kiedy otrzymują wiadomość. Kiedy obudzona wiadomość z procesora <i>i</i> sięga obudzonego procesora, komnikat zaczyna krążyć z prędkością 2 <sup>i</sup> (każdy procesor, który otrzymuje taki komunikat otrzymuje opóźnienie dla 2 <sup>i-1</sup> rund zanim znowu ruszy). Komunikat jest w <i>pierwszej fazie</i> tak długo jak krązy w regularnym tempie i jest w <i>drugiej fazie</i> kiedy krąży z prędkością 2 <sup>i</sup>.</p>
+        <p>Poprzez algorytm, procesory przesyłają komunikaty. Jednak, jak widzieliśmy w poprzednim algorytmie wyboru lidera procesory czasami ignorują komunikaty bez przekazywania ich dalej. W tym algorytmie, komunikaty są ignorowane według następujących zasad:</p>
+        <ol>
+            <li>Uczestniczący procesor ignoruje komunikat jeśli id komunikatu jest większe niż minimalne id jakie widział do tej pory (licząc swoje id)</li>
+            <li>Procesor przekaźnikowy ignoruje komunikat jeśli id komnikatu nie jest minimalnym jakie widział do tej pory (nie licząc swojego)</li>
+        </ol>
+        <p>Jak dowodzimy poniżej, <i>n</i> rund po pierwszym przebudzeniu procesora, tylko w drugiej fazie komunikaty idą w lewo i lider jest wybrany spośród obudzonych procesoró. Zasady ignorowania gwarantują, że tylko uczestniczące procesory z najmnijeszym id otrzymają komunikat zwrotny i będą wybrane na lidera. To jest udowodniane w następnym lemacie</p>
+        
+        
+        
+        <h2>Kolorowanie wierzchołkowe w drzewie ukorzenionym i w grafach stałego stopnia</h2>
         <ul>
             <li>Każde <b>drzewo</b> może być pokolorowane <b>dwoma kolorami</b></li>
             <li>Każdy <b>graf</b> któego maksymalnym stpomniem liścia jest <i>D</i> może być pokolorowany poprzez <i>D+1</i> kolory</li>
@@ -145,7 +158,12 @@
         <p>Ta sekcja opisuje założenia modelu obliczeniowego i wprawadza notację używaną potem na papierze. Rozważamy proste, nieskierowany grafy z <i>v</i> wierzchołkami i <i>m</i> krawędziami. Maksymalny stopień grafu jest oznaczana przez &Delta;. Graf indukawany przez zestaw wierzchołków <i>X</i> jest oznaczany przez G[X]. </p>
         <p>Podając graf <i>G = (V, E)</i> możemy powiedzieć że podzbiór wierzchołków <i>I</i> &straightepsilon; <i>V</i> jest <i>niezależny</i> jeśli nie ma dwóch wierzchołków w <i>I</i> będących sąsiadami. <i>Kolorowaniem</i> w grafie <i>G</i> jest ustalenie C : V &rarr; I <sup>+</sup> złożonych z dodatnich liczb (kolorów) dla wierzchołków w grafie. Kolorowanie jest <i>akceptowalne</i> jeśli nie ma dwóch sąsiadó o tych samych kolorach. <i>I <sup>te</sup></i> bity w kolorze wierzchołka <i>v</i> są oznaczone przez <i>C <sub>v</sub>(i)</i>. Podzbiór krawędzi <i>M</i> &straightepsilon; <i>E</i> jest prawidłowy jeśli każda para różnych krawędzi w <i>M</i> nie ma wspólnych wierzchołków</p>
         <h2><a href="http://students.wmi.amu.edu.pl:20002/zajecia/_xowiki2/download/file/fmatch.pdf">Skojarzenie maximal w grafie dwudzielnym, w czasie O(log^4n)</a></h2>
+        <p>Na początku mamy Graf <i>G(V,E)</i>, gdzie <i>V</i> to zbiór wierzchołków, a <i>E</i> to zbiór krawędzi. Rozpatrujemy grafy <b>proste</b>, czyli takie, które nie mają wielokrotnych krawędzi między dwoma wierzchołkami i nie posiadające <i>pętli</i>(krawędź do siebie samej). Stopień wierzchołka to <i>d <sub>G</sub>(v)</i>. Graf dwudzielny oznaczamy przez <i>G <sub>LR</sub></i> gdzie <b>L</b> i <b>R</b> to zbiory wierzchołków</p>
+        <p>Krawędzie są <b>incydentne</b> jeśli mają wspólny koniec. Krawędź jest incydentna do wierzchołka esli z niego wychodzi. Krawędź jest incydentna do podgrafu jeśli jest incydentna z jednym z jej wierzchołków. Podgraf nazywamy <b>skojarzeniem</b> jeśli żadne dwie krawędzie tego podgrafu nie są incydentne. Wierzchołek jest skojarzony jeśli jest końcem pewnej krawędzi należącej do skojarzenia. Skojarzenie jest <b>maksymalne</b> gdy każdy jego wierzchołek jest skojarzony, albo wszyscy jego sąsiedzi są skojarzeni.</p>
+        <p>Procedury synchroniczne to takie, które wykonują operację na wszystkich procesorach. Elementarne są zwykłe, a nieelementarne mogą wywoływać inne procedury.</p>
+        <p></p>
         <h2>dekompozycja L&S (Liniala&Saksa)</h2>
+        <p><b>Maksymalne skojarzenie</b> to suma wszystkich skojarzeń znjadowanych w kolejnych iteracjach pętli</p>
     </div>
     <footer class="w3-container w3-theme-d3">
         Page created by: Szumimajster with using <a href="https://www.w3schools.com/w3css/">w3.css</a>
